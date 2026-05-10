@@ -25,7 +25,7 @@ A modern, containerized **RESTful API** application for managing a library syste
 
 The easiest way to run the application is via Docker. This will automatically spin up the MySQL database and the Spring Boot application.
 
-1. Ensure you have [Docker](https://www.docker.com/) installed and running.
+1. Ensure you have Docker installed and running.
 2. Open your terminal in the root directory of the project.
 3. Run the following command:
 
