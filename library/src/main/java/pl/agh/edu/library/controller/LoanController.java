@@ -3,7 +3,7 @@ package pl.agh.edu.library.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.agh.edu.library.model.Loan;
+import pl.agh.edu.library.dto.LoanDto;
 import pl.agh.edu.library.service.LoanService;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class LoanController {
     }
 
     @PostMapping("/reserve")
-    public ResponseEntity<Loan> reserveBook(@RequestParam Long userId, @RequestParam Long bookId) {
+    public ResponseEntity<LoanDto> reserveBook(@RequestParam Long userId, @RequestParam Long bookId) {
         try {
             return ResponseEntity.ok(loanService.reserveBook(userId, bookId));
         } catch (RuntimeException e) {
@@ -29,7 +29,7 @@ public class LoanController {
     }
 
     @PostMapping("/loan")
-    public ResponseEntity<Loan> loanBook(@RequestParam Long userId, @RequestParam Long bookId) {
+    public ResponseEntity<LoanDto> loanBook(@RequestParam Long userId, @RequestParam Long bookId) {
         try {
             return ResponseEntity.ok(loanService.loanBook(userId, bookId));
         } catch (RuntimeException e) {
@@ -38,7 +38,7 @@ public class LoanController {
     }
 
     @PostMapping("/return/{loanId}")
-    public ResponseEntity<Loan> returnBook(@PathVariable Long loanId) {
+    public ResponseEntity<LoanDto> returnBook(@PathVariable Long loanId) {
         try {
             return ResponseEntity.ok(loanService.returnBook(loanId));
         } catch (RuntimeException e) {
@@ -47,7 +47,7 @@ public class LoanController {
     }
 
     @GetMapping
-    public List<Loan> getAllLoans() {
+    public List<LoanDto> getAllLoans() {
         return loanService.getAllLoans();
     }
 }

@@ -19,7 +19,7 @@ public class Book {
     Integer quantity;
     
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore //zapobiega rekurencji
+    @JsonIgnore
     private List<Loan> loans = new ArrayList<>();
     
     @ManyToMany
@@ -33,6 +33,10 @@ public class Book {
 	public Integer getId() {
 		return id;
 	}
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
 	public String getName() {
 		return name;

@@ -26,24 +26,25 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Publiczne zasoby (H2, Frontend, Logowanie)
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/", "/index.html", "/app.js", "/favicon.ico").permitAll() // Pliki statyczne
-                        .requestMatchers("/account/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Rejestracja
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll() // Przeglądanie książek
-						.requestMatchers(HttpMethod.GET, "/api/categories").permitAll() // Przegladanie kategorii
 
-                        // 2. Zasoby tylko dla ADMINA
+                        .requestMatchers("/", "/index.html", "/*.css", "/*.js", "/css/**", "/js/**", "/assets/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/account/**", "/login/**", "/api/login/**").permitAll()
+
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/docs").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/loans").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
 
-                        // 3. Reszta (np. wypożyczanie) wymaga bycia zalogowanym (USER lub ADMIN)
                         .anyRequest().authenticated()
                 );
 

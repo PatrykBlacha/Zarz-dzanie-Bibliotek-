@@ -1,479 +1,72 @@
-Liber jest programem służącym do zarządzania biblioteką. Zbudowany przy użyciu javy i framewroka bootspring wraz z hibernate.
+# Library Management System
 
-Aktualnie aplikacja implementuje podstawowe operacje CRUD na użytkowniku
+A modern, containerized **RESTful API** application for managing a library system, built with **Java 21** and **Spring Boot 3**. This project demonstrates best practices in backend development, including multi-layered architecture, secure authentication, containerization, and unit testing.
 
+## Features
 
+* **User Management & Authentication**: Secure registration and login using **JWT (JSON Web Tokens)**. Role-based access control (e.g., `USER`, `ADMIN`).
+* **Book & Category Management**: CRUD operations for books and categories. Admin-only privileges for modifying the library's catalog.
+* **Loan System**: Users can reserve, borrow, and return books. Built-in business logic (e.g., max 10 active loans per user).
+* **DTO Pattern & Mapping**: Strict separation of database entities and API payload using Data Transfer Objects and the Builder pattern to prevent infinite recursion and data exposure.
+* **Global Exception Handling**: Centralized error handling using `@ControllerAdvice` to provide clean, consistent JSON error responses.
+* **Frontend UI**: Built-in vanilla HTML/JS/CSS frontend served statically by Spring Boot to easily test and interact with the API.
 
-Struktura ptojektu:
-```
-.
-pl.agh.edu.library
-│
-├── controller
-│   ├── BookController
-│   ├── CategoryController
-│   ├── LoanController
-│   ├── LoginController
-│   └── UserController
-│
-├── service
-│   ├── UserService
-│   ├── LoanService
-│   ├── CategoryService
-│   ├── LibraryService
-│   └── BookService
-│
-├── dto
-│   └── Category
-|
-├── security
-│   ├── SecurityConfig
-│   ├── JwtUtil
-│   └── JwtFilter
-|
-├── model
-│   ├── User
-│   ├── Loan
-│   ├── Book
-│   └── Category
-│
-└── repository
-    └── UserRepository
-    └── LoanRepository
-    └── CategoryRepository
-    └── BookRepository
-
-```
-Kontrolery
-
-[UserController](#UserController)
-
-[BookController](#BookController)
-
-[LoanController](#LoanController)
-
-[LoginController](#LoginController)
-
-
-## UserController
-```
-Package: pl.agh.edu.library.controller
-Base URL: /api/users
-Dependencies: UserService
-```
-
-Endpointy:
-
-1. Pobieranie Listy użytkowników.
-```GET /api/users```
-
-
-Opis:
-
-Zwraca listę użytkwoników zapisanych w bazie danych.
-
-Odpowiedź:
-
-```
-200 OK
-Body: List<User>
-```
-2. Stworzenie nowego użytkownika.
-```
-POST /api/users
-```
-
-Opis:
-
-Dodaje nowego użytkownika do bazy danych.
-
-Przykład:
-```
-Request Body (JSON example):
-
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john.doe@email.com",
-  "password": "password123",
-  "role": "USER"
-}
-```
-
-Odpowiedź:
-```
-200 OK 
-```
-3. Znajdź użytkownika po id
-```
-GET /api/users/{id}
-```
-
-Opis:
-
-Zwraca użytkownika z podanym id.
-
-Odpowiedzi:
-```
-200 OK + User object if found
-```
-```
-404 Not Found if user does not exist
-```
-4. Aktualizacja użytkownika
-```
-PUT /api/users/{id}
-```
-
-Opis:
-
-Aktualizuje dane użytkownika (first name, last name, email, role).
-
-Request Body:
-Obiekt użytkownika z nowymi danymi.
-
-Odpowiedzi:
-```
-200 OK + updated User
-```
-```
-404 Not Found if user does not exist
-```
-5. Usuwanie użytkownika
-```
-DELETE /api/users/{id}
-```
-
-Opis:
-
-Usuwa użytkownika z podanym id.
-
-Response:
-```
-200 OK
-```
-
-
-
-
-
-## BookController
-```
-Base URL: /api/books
-Dependencies: BookService
-```
-
-Endpointy
-1. Pobranie listy książek
-```
-GET /api/books
-```
-
-
-Zwraca wszystkie książki.
-
-Odpowiedź:
-```
-200 OK
-Body: List<Book>
-```
-
-2. Dodanie książki
-```
-POST /api/books
-```
-
-
-Przykład JSON:
-```
-{
-  "name": "Dune",
-  "author": "Frank Herbert",
-  "quantity": 5
-}
-```
-
-
-Odpowiedź:
-```
-200 OK
-```
-
-3. Pobranie książki po ID
-```
-GET /api/books/{id}
-```
-
-
-Odpowiedzi:
-```
-200 OK + Book
-404 Not Found
-```
-
-4. Usunięcie książki
-```
-DELETE /api/books/{id}
-```
-
-
-Odpowiedź:
-```
-200 OK
-```
-
-5. Aktualizacja książki
-```
-PUT /api/books/{id}
-```
-
-
-Aktualizuje pola: name, author, quantity.
-
-Odpowiedzi:
-```
-200 OK + updated Book
-404 Not Found
-```
-
-6. Przypisanie kategorii do książki
-```
-POST /api/books/{bookId}/categories/{categoryId}
-```
-
-
-Odpowiedź:
-```
-200 OK
-```
-
-## LoanController
-```
-Base URL: /api/loans
-Dependencies: LoanService
-```
-
-Endpointy
-1. Rezerwacja książki
-```
-POST /api/loans/reserve?userId={userId}&bookId={bookId}
-```
-
-
-Odpowiedzi:
-```
-200 OK + Loan
-400 Bad Request
-```
-
-2. Wypożyczenie książki
-```
-POST /api/loans/loan?userId={userId}&bookId={bookId}
-```
-
-
-Odpowiedzi:
-
-```
-200 OK + Loan
-400 Bad Request
-```
-
-3. Zwrot książki
-```
-POST /api/loans/return/{loanId}
-```
-
-
-Odpowiedzi:
-
-```
-200 OK + Loan
-400 Bad Request
-```
-
-4. Lista wypożyczeń
-```
-GET /api/loans
-```
-
-
-Odpowiedź:
-
-```
-200 OK
-Body: List<Loan>
-```
-
-## LoginController
-```
-Base URL: /account
-Dependencies: UserRepository, JwtUtil
-```
-
-Endpointy
-1. Logowanie
-```
-POST /account/login
-```
-
-
-Przykład JSON:
+## Tech Stack
 
-```
-{
-  "userName": "admin",
-  "password": "admin123"
-}
-```
-
-
-Odpowiedzi:
-
-```
-200 OK + JWT token
-
-```
-
-lub
-
-```
-200 OK + "wrong username or password"
-```
-
-## Security
+* **Language**: Java 21
+* **Framework**: Spring Boot 3.4.0 (Spring Web, Spring Security, Spring Data JPA)
+* **Database**: MySQL (Production/Docker) & H2 (In-memory for local testing)
+* **Security**: Spring Security + JWT (`io.jsonwebtoken`)
+* **Testing**: JUnit 5, Mockito, MockMvc
+* **Build Tool**: Gradle
+* **Containerization**: Docker, Docker Compose
 
-System Autoryzacji użytkowników przechowywany jest w katalogu security.
-Jest on oparty na systemie SpringSecurity wykorzystując tokeny JWT
+## Quick Start (Recommended)
 
+The easiest way to run the application is via Docker. This will automatically spin up the MySQL database and the Spring Boot application.
 
-## JwtFilter
-```
-Package: pl.agh.edu.library.security
-Class: JwtFilter
-Extends: OncePerRequestFilter
-Dependencies: JwtUtil
-```
-Opis
-
-Filtr odpowiedzialny za:
-
-odczyt tokenu JWT z nagłówka HTTP Authorization
-
-walidację tokenu
-
-odtworzenie użytkownika w kontekście Spring Security
+1. Ensure you have [Docker](https://www.docker.com/) installed and running.
+2. Open your terminal in the root directory of the project.
+3. Run the following command:
 
-ustawienie uprawnień użytkownika na podstawie ról w tokenie
-
-Filtr uruchamiany jest raz na każde żądanie HTTP.
-
-## JwtUtil
-```
-Package: pl.agh.edu.library.security
-Class: JwtUtil
+```bash
+docker-compose up --build
 ```
-Opis
-
-Klasa odpowiedzialna za:
-
-generowanie tokenów JWT
-
-walidację tokenów
-
 
-## SecurityConfig
-```
-Package: pl.agh.edu.library.security
-Class: SecurityConfig
-```
-Opis
+4. Once the containers are running, open your browser and visit:
+   👉 **http://localhost:8080/**
 
-Klasa przechowująca konfigurację zabezpieczeń wykożystywaną przez aplikację.
+## 💻 Local Development Setup
 
-Elementy konfiguracji:
+If you prefer to run the application locally without Docker (e.g., via IntelliJ IDEA):
 
-1. Wyłączenia
-```
-csrf disabled
-cors enabled
-frameOptions disabled (dla H2)
-sessionCreationPolicy STATELESS
-```
+1. The application uses an **H2 In-Memory Database** by default when run via Gradle.
+2. Build and run the app:
+   ```bash
+   ./gradlew bootRun
+   ```
+3. Access the application at **http://localhost:8081/** (Port defined in `application.properties`).
+4. **H2 Console** is available at `http://localhost:8081/h2-console` (JDBC URL: `jdbc:h2:./school`).
 
-3. Dostęp publiczny
-```
-.requestMatchers("/h2-console/**").permitAll()
-.requestMatchers("/", "/index.html", "/app.js", "/favicon.ico").permitAll() // Pliki statyczne
-.requestMatchers("/account/**").permitAll()
-.requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Rejestracja
-```
+## Running Tests
 
-3. Endpointy tylko dla ADMIN
-```
-.requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
-.requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
-.requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
-```
+The project includes comprehensive unit tests for Services and Controllers, utilizing **Mockito** and **MockMvc**. To run the test suite:
 
-4. Endpointy wymagające zalogowania (USER lub ADMIN)
-```
-anyRequest().authenticated()
+```bash
+./gradlew test
 ```
-
-
-
-## Model Bazy Danych.
-
-
-
-
-Tabela: ```users```
-
-| Pole      | Typ        | Opis                                    |
-| --------- | ---------- | --------------------------------------- |
-| id        | Integer    | Klucz główny (generowany automatycznie) |
-| email     | String     | Adres e-mail użytkownika                |
-| firstName | String     | Imię                                    |
-| lastName  | String     | Nazwisko                                |
-| password  | String     | Hasło użytkownika                       |
-| role      | String     | Rola użytkownika (np. USER, ADMIN)      |
-| loans     | List<Loan> | Relacja jeden-do-wielu                  |
-
-
-Tabela ```reservations```
-| Pole            | Typ     | Opis                          |
-| --------------- | ------- | ----------------------------- |
-| id              | Integer | Klucz główny                  |
-| state           | String  | Status wypożyczenia           |
-| reservationDate | Date    | Data rezerwacji               |
-| loanDate        | Date    | Data rozpoczęcia wypożyczenia |
-| returnDate      | Date    | Data zwrotu                   |
-| user            | User    | Użytkownik wypożyczający      |
-| book            | Book    | Wypożyczona książka           |
-
-
-Tabela ```books```
-| Pole       | Typ           | Opis                 |
-| ---------- | ------------- | -------------------- |
-| id         | Integer       | Klucz główny         |
-| name       | String        | Tytuł książki        |
-| author     | String        | Autor książki        |
-| quantity   | Integer       | Liczba egzemplarzy   |
-| loans      | List<Loan>    | Wypożyczenia książki |
-| categories | Set<Category> | Przypisane kategorie |
-
-
-Tabela ```categories```
-| Pole  | Typ       | Opis                |
-| ----- | --------- | ------------------- |
-| id    | Integer   | Klucz główny        |
-| name  | String    | Nazwa kategorii     |
-| books | Set<Book> | Książki w kategorii |
-
-
-
 
+## Architecture & Patterns Used
 
+* **N-Tier Architecture**: Controller -> Service -> Repository.
+* **DTO (Data Transfer Object)**: Decouples the presentation layer from the persistence layer.
+* **Builder Pattern**: Used inside DTOs for cleaner and more maintainable object instantiation.
+* **Mapper Pattern**: Manual mappers to translate between Entities and DTOs.
+* **Multi-stage Docker Build**: Optimizes the final Docker image size by separating the build environment from the runtime environment.
 
+## API Endpoints Overview
 
+* **Auth**: `POST /account/login`, `POST /api/users` (Registration)
+* **Books**: `GET /api/books`, `POST /api/books` (Admin), `PUT /api/books/{id}` (Admin), `DELETE /api/books/{id}` (Admin)
+* **Categories**: `GET /api/categories`, `POST /api/categories` (Admin), `DELETE /api/categories/{id}` (Admin)
+* **Loans**: `POST /api/loans/reserve`, `POST /api/loans/loan`, `POST /api/loans/return/{id}`, `GET /api/loans` (Admin)

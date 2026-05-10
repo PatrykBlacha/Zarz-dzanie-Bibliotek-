@@ -3,7 +3,7 @@ package pl.agh.edu.library.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.agh.edu.library.model.Book;
+import pl.agh.edu.library.dto.BookDto;
 import pl.agh.edu.library.service.BookService;
 
 import java.util.List;
@@ -19,17 +19,17 @@ public class BookController {
 	}
 
 	@GetMapping
-	public List<Book> getBooks() {
+	public List<BookDto> getBooks() {
 		return bookService.getBooks();
 	}
 
 	@PostMapping
-	public void addUser(@RequestBody Book book) {
-		bookService.addBook(book);
+	public void addBook(@RequestBody BookDto bookDto) {
+		bookService.addBook(bookDto);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Book> getBook(@PathVariable Long id) {
+	public ResponseEntity<BookDto> getBook(@PathVariable Long id) {
 		return bookService.getBook(id)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
@@ -41,15 +41,9 @@ public class BookController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
-		return bookService.getBook(id)
-				.map(book -> {
-					book.setName(bookDetails.getName());
-					book.setAuthor(bookDetails.getAuthor());
-					book.setQuantity(bookDetails.getQuantity());
-					bookService.addBook(book);
-					return ResponseEntity.ok(book);
-				})
+	public ResponseEntity<BookDto> updateBook(@PathVariable Long id, @RequestBody BookDto bookDetails) {
+		return bookService.updateBook(id, bookDetails)
+				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
 	}
 

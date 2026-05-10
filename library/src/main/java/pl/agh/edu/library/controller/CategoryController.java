@@ -2,7 +2,7 @@ package pl.agh.edu.library.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pl.agh.edu.library.model.Category;
+import pl.agh.edu.library.dto.CategoryDto;
 import pl.agh.edu.library.service.CategoryService;
 
 import java.util.List;
@@ -18,8 +18,8 @@ public class CategoryController {
 	}
 
 	@PostMapping
-	public void addCategory(@RequestBody Category category) {
-		categoryService.addCategory(category);
+	public void addCategory(@RequestBody CategoryDto categoryDto) {
+		categoryService.addCategory(categoryDto);
 	}
 
 	@DeleteMapping("/{id}")
@@ -28,7 +28,7 @@ public class CategoryController {
 	}
 
 	@GetMapping
-	public List<Category> getCategories() {
+	public List<CategoryDto> getCategories() {
 		return categoryService.getCategories();
 	}
 }

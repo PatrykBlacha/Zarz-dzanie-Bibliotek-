@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.agh.edu.library.controller.UserController;
 import pl.agh.edu.library.model.User;
 
-@RestController
+@Service
 public class LibraryService {
     private final UserController userController;
     public LibraryService(UserController userController) {
@@ -17,11 +17,6 @@ public class LibraryService {
     @PostConstruct
     public void addExampleUser() {
         System.out.println("Adding example user");
-    }
-
-    @GetMapping("/")
-    public String hello() {
-        return "Main Library page";
     }
 
 }

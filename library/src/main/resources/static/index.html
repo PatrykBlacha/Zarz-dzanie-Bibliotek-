@@ -25,13 +25,14 @@
     <input type="text" id="regName" placeholder="Name" required />
     <input type="email" id="regEmail" placeholder="Email" required />
     <input type="password" id="regPassword" placeholder="Password" required />
-    <input type="text" id="regRole" placeholder="Role (e.g., USER)" required />
+    <input type="text" id="regRole" placeholder="Role (e.g., ADMIN)" required />
     <button type="submit">Register</button>
   </form>
 
   <h2>Login</h2>
   <form id="loginForm">
-    <input type="email" id="loginEmail" placeholder="Email" required />
+    <!--  Zmieniony z type="email" na type="text" zeby login byl oparty na imieniu  -->
+    <input type="text" id="loginEmail" placeholder="Username (Name z rejestracji)" required />
     <input type="password" id="loginPassword" placeholder="Password" required />
     <button type="submit">Login</button>
   </form>
@@ -41,6 +42,14 @@
   <h2>Dashboard</h2>
   <p id="welcome"></p>
   <button id="logoutBtn">Logout</button>
+
+  <div class="action-group">
+    <h3>Dodawanie Książki (Tylko ADMIN)</h3>
+    <input type="text" id="bookName" placeholder="Tytuł książki" />
+    <input type="text" id="bookAuthor" placeholder="Autor" />
+    <input type="number" id="bookQuantity" placeholder="Ilość" />
+    <button id="btnAddBook">Dodaj Książkę</button>
+  </div>
 
   <div class="action-group">
     <h3>Test Wypożyczeń / Rezerwacji</h3>

@@ -22,7 +22,7 @@ public class User {
     private String role;
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore //przerywa rekurencje
+    @JsonIgnore
     private List<Loan> loans = new ArrayList<>();
 
 
@@ -80,6 +80,7 @@ public class User {
         this.password = password;
     }
     public boolean checkPassword(String password){
+        if (this.password == null || password == null) return false;
         return this.password.equals(password);
     }
 

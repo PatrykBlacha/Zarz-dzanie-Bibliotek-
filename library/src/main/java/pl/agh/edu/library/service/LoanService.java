@@ -2,6 +2,8 @@ package pl.agh.edu.library.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.agh.edu.library.dto.LoanDto;
+import pl.agh.edu.library.mapper.LoanMapper;
 import pl.agh.edu.library.model.Book;
 import pl.agh.edu.library.model.Loan;
 import pl.agh.edu.library.model.User;
@@ -12,6 +14,7 @@ import pl.agh.edu.library.repository.UserRepository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LoanService {
@@ -27,7 +30,7 @@ public class LoanService {
         this.bookRepository = bookRepository;
     }
 
-    public Loan reserveBook(Long userId, Long bookId) {
+    public LoanDto reserveBook(Long userId, Long bookId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
 
@@ -37,10 +40,10 @@ public class LoanService {
         loan.setState("RESERVED");
         loan.setReservationDate(Date.valueOf(LocalDate.now()));
         
-        return loanRepository.save(loan);
+        return LoanMapper.toDto(loanRepository.save(loan));
     }
 
-    public Loan loanBook(Long userId, Long bookId) {
+    public LoanDto loanBook(Long userId, Long bookId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         
         // --- SPRAWDZENIE LIMITU ---
@@ -61,17 +64,19 @@ public class LoanService {
         loan.setState("LOANED");
         loan.setLoanDate(Date.valueOf(LocalDate.now()));
         
-        return loanRepository.save(loan);
+        return LoanMapper.toDto(loanRepository.save(loan));
     }
     
-    public Loan returnBook(Long loanId) {
+    public LoanDto returnBook(Long loanId) {
         Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new RuntimeException("Loan not found"));
         loan.setState("RETURNED");
         loan.setReturnDate(Date.valueOf(LocalDate.now()));
-        return loanRepository.save(loan);
+        return LoanMapper.toDto(loanRepository.save(loan));
     }
 
-    public List<Loan> getAllLoans() {
-        return loanRepository.findAll();
+    public List<LoanDto> getAllLoans() {
+        return loanRepository.findAll().stream()
+                .map(LoanMapper::toDto)
+                .collect(Collectors.toList());
     }
 }
