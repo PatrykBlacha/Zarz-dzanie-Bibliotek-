@@ -34,9 +34,9 @@ docker-compose up --build
 ```
 
 4. Once the containers are running, open your browser and visit:
-   👉 **http://localhost:8080/**
+   **http://localhost:8080/**
 
-## 💻 Local Development Setup
+## Local Development Setup
 
 If you prefer to run the application locally without Docker (e.g., via IntelliJ IDEA):
 

@@ -1,41 +1,38 @@
 version: '3.8'
 
 services:
-  # Konfiguracja bazy danych MySQL
   db:
     image: mysql:8.4.0
     container_name: library_mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: library_db # Baza danych zostanie utworzona przy pierwszym uruchomieniu
+      MYSQL_DATABASE: library_db
       MYSQL_USER: library_user
       MYSQL_PASSWORD: library_password
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql # Mapowanie wolumenu, aby dane bazy przetrwały restarty kontenera
+      - mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
 
-  # Konfiguracja aplikacji Spring Boot
   app:
     build:
-      context: ./library # Ścieżka do katalogu z plikiem Dockerfile
+      context: ./library
       dockerfile: Dockerfile
     container_name: library_app
     ports:
-      - "8080:8080" # Mapowanie portu 8080 kontenera na port 8080 hosta
+      - "8080:8080"
     environment:
-      # Poniższe zmienne środowiskowe nadpiszą domyślną konfigurację z application.properties
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/library_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=library_user
       - SPRING_DATASOURCE_PASSWORD=library_password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
       db:
-        condition: service_healthy # Aplikacja poczeka aż baza danych będzie gotowa do przyjęcia połączeń
+        condition: service_healthy
 
 volumes:
-  mysql_data: # Zdefiniowanie wolumenu dla danych MySQL
+  mysql_data:
